@@ -8,10 +8,34 @@ class Matrix {
  public:
   // Constructors and operators=
   Matrix(size_t rows, size_t columns) : data_(rows * columns), columns_(columns) {
+    if (data_.empty()) {
+      throw std::runtime_error("Cannot construct empty matrix");
+    }
   }
 
   Matrix(size_t rows, size_t columns, double value)
     : data_(rows * columns, value), columns_(columns) {
+    if (data_.empty()) {
+      throw std::runtime_error("Cannot construct empty matrix");
+    }
+  }
+
+  Matrix(const std::vector<std::vector<double>>& data) {
+    if (data.empty() || data[0].empty()) {
+      throw std::runtime_error("Cannot construct empty matrix");
+    }
+    size_t rows = data.size();
+    size_t columns = data[0].size();
+    columns_ = columns;
+    data_.reserve(rows * columns);
+    for (size_t i = 0; i != rows; ++i) {
+      if (data[i].size() != columns) {
+        throw std::runtime_error("Different row size");
+      }
+      for (size_t j = 0; j != columns; ++j) {
+        data_.push_back(data[i][j]);
+      }
+    }
   }
 
   Matrix(const Matrix& other) {
@@ -113,6 +137,15 @@ class Matrix {
     return ConstRowViewer(data_, columns_, row_idx);
   }
 
+  // Faster version of indexing
+  double operator()(size_t row_idx, size_t column_idx) const {
+    return data_[row_idx * columns_ + column_idx];
+  }
+
+  double& operator()(size_t row_idx, size_t column_idx) {
+    return data_[row_idx * columns_ + column_idx];
+  }
+
  private:
   std::vector<double> data_;
   size_t columns_;
@@ -147,7 +180,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix& m) {
 
 
 bool operator==(const Matrix& lhs, const Matrix& rhs) {
-  if (lhs.rows() != rhs.rows() || lhs.columns() != rhs.columns()) {
+  if (lhs.shape() != rhs.shape()) {
     return false;
   }
   for (size_t i = 0; i != lhs.rows(); ++i) {
