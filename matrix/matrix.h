@@ -7,11 +7,11 @@
 class Matrix {
  public:
   // Constructors and operators=
-  Matrix(size_t height, size_t width) : data_(height * width), width_(width) {
+  Matrix(size_t rows, size_t columns) : data_(rows * columns), columns_(columns) {
   }
 
-  Matrix(size_t height, size_t width, double value)
-    : data_(height * width, value), width_(width) {
+  Matrix(size_t rows, size_t columns, double value)
+    : data_(rows * columns, value), columns_(columns) {
   }
 
   Matrix(const Matrix& other) {
@@ -24,24 +24,24 @@ class Matrix {
 
   Matrix& operator=(const Matrix& other) {
     data_ = other.data_;
-    width_ = other.width_;
+    columns_ = other.columns_;
     return *this;
   }
 
   Matrix& operator=(Matrix&& other) {
     data_ = std::move(other.data_);
-    width_ = other.width_;
+    columns_ = other.columns_;
     return *this;
   }
 
 
   // Shape methods
-  size_t width() const {
-    return width_;
+  size_t columns() const {
+    return columns_;
   }
 
-  size_t height() const {
-    return size() / width_;
+  size_t rows() const {
+    return size() / columns_;
   }
 
   size_t size() const {
@@ -49,11 +49,11 @@ class Matrix {
   }
 
   struct Shape {
-    size_t height;
-    size_t width;
+    size_t rows;
+    size_t columns;
 
     bool operator==(const Shape& other) const {
-      return height == other.height && width == other.width;
+      return rows == other.rows && columns == other.columns;
     }
 
     bool operator!=(const Shape& other) const {
@@ -62,7 +62,7 @@ class Matrix {
   };
 
   Shape shape() const {
-    return Shape{height(), width()};
+    return Shape{rows(), columns()};
   }
 
 
@@ -71,72 +71,72 @@ class Matrix {
   class RowViewer {
    public:
     double& operator[](size_t column_idx) {
-      return data_[row_idx_ * width_ + column_idx];
+      return data_[row_idx_ * columns_ + column_idx];
     }
 
    private:
     friend class Matrix;
 
-    RowViewer(std::vector<double>& data, size_t width, size_t row_idx)
-      : data_(data), width_(width), row_idx_(row_idx) {
+    RowViewer(std::vector<double>& data, size_t columns, size_t row_idx)
+      : data_(data), columns_(columns), row_idx_(row_idx) {
     }
 
     std::vector<double>& data_;
-    const size_t width_;
+    const size_t columns_;
     const size_t row_idx_;
   };
 
   class ConstRowViewer {
    public:
     double operator[](size_t column_idx) const {
-      return data_[row_idx_ * width_ + column_idx];
+      return data_[row_idx_ * columns_ + column_idx];
     }
 
    private:
     friend class Matrix;
 
-    ConstRowViewer(const std::vector<double>& data, size_t width, size_t row_idx)
-      : data_(data), width_(width), row_idx_(row_idx) {
+    ConstRowViewer(const std::vector<double>& data, size_t columns, size_t row_idx)
+      : data_(data), columns_(columns), row_idx_(row_idx) {
     }
 
     const std::vector<double>& data_;
-    const size_t width_;
+    const size_t columns_;
     const size_t row_idx_;
   };
 
  public:
   RowViewer operator[](size_t row_idx) {
-    return RowViewer(data_, width_, row_idx);
+    return RowViewer(data_, columns_, row_idx);
   }
 
   ConstRowViewer operator[](size_t row_idx) const {
-    return ConstRowViewer(data_, width_, row_idx);
+    return ConstRowViewer(data_, columns_, row_idx);
   }
 
  private:
   std::vector<double> data_;
-  size_t width_;
+  size_t columns_;
 };
 
 
 std::ostream& operator<<(std::ostream& os, const Matrix::Shape& s) {
-  return os << "(" << s.height << ", " << s.width << ")";
+  return os << "(" << s.rows << ", " << s.columns << ")";
 }
 
 std::ostream& operator<<(std::ostream& os, const Matrix& m) {
-  for (size_t i = 0; i != m.height(); ++i) {
+  for (size_t i = 0; i != m.rows(); ++i) {
     if (i == 0) {
       os << "(";
     } else {
       os << " ";
     }
-    for (size_t j = 0; j != m.width(); ++j) {
+    for (size_t j = 0; j != m.columns(); ++j) {
       os << m[i][j];
-      if (j + 1 != m.width()) {
+      if (j + 1 != m.columns()) {
         os << '\t';
       }
     }
-    if (i + 1 == m.height()) {
+    if (i + 1 == m.rows()) {
       os << ')';
     } else {
       os << '\n';
@@ -147,11 +147,11 @@ std::ostream& operator<<(std::ostream& os, const Matrix& m) {
 
 
 bool operator==(const Matrix& lhs, const Matrix& rhs) {
-  if (lhs.height() != rhs.height() || lhs.width() != rhs.width()) {
+  if (lhs.rows() != rhs.rows() || lhs.columns() != rhs.columns()) {
     return false;
   }
-  for (size_t i = 0; i != lhs.height(); ++i) {
-    for (size_t j = 0; j != lhs.width(); ++j) {
+  for (size_t i = 0; i != lhs.rows(); ++i) {
+    for (size_t j = 0; j != lhs.columns(); ++j) {
       if (lhs[i][j] != rhs[i][j]) {
         return false;
       }
@@ -166,7 +166,7 @@ bool operator!=(const Matrix& lhs, const Matrix& rhs) {
 
 
 Matrix operator*(const Matrix& lhs, const Matrix& rhs) {
-  if (lhs.width() != rhs.height()) {
+  if (lhs.columns() != rhs.rows()) {
     std::stringstream ss;
     ss << "Cannot multiply matrix with shape "
        << lhs.shape()
@@ -174,11 +174,11 @@ Matrix operator*(const Matrix& lhs, const Matrix& rhs) {
        << rhs.shape();
     throw std::runtime_error(ss.str());
   }
-  Matrix res(lhs.height(), rhs.width());
-  for (size_t i = 0; i != res.height(); ++i) {
-    for (size_t j = 0; j != res.width(); ++j) {
+  Matrix res(lhs.rows(), rhs.columns());
+  for (size_t i = 0; i != res.rows(); ++i) {
+    for (size_t j = 0; j != res.columns(); ++j) {
       res[i][j] = 0;
-      for (size_t k = 0; k != lhs.width(); ++k) {
+      for (size_t k = 0; k != lhs.columns(); ++k) {
         res[i][j] += lhs[i][k] * rhs[k][j];
       }
     }
