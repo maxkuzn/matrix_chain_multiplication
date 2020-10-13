@@ -180,17 +180,17 @@ std::ostream& operator<<(std::ostream& os, const Matrix& m) {
 
 
 bool operator==(const Matrix& lhs, const Matrix& rhs) {
+  static const double kMaxDifferenceForEquality = 1e-7;
   if (lhs.shape() != rhs.shape()) {
     return false;
   }
+  double diff = 0;
   for (size_t i = 0; i != lhs.rows(); ++i) {
     for (size_t j = 0; j != lhs.columns(); ++j) {
-      if (lhs(i, j) != rhs(i, j)) {
-        return false;
-      }
+      diff += (lhs(i, j) - rhs(i, j)) * (lhs(i, j) - rhs(i, j));
     }
   }
-  return true;
+  return diff < kMaxDifferenceForEquality;
 }
 
 bool operator!=(const Matrix& lhs, const Matrix& rhs) {
