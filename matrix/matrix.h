@@ -164,7 +164,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix& m) {
       os << " ";
     }
     for (size_t j = 0; j != m.columns(); ++j) {
-      os << m[i][j];
+      os << m(i, j);
       if (j + 1 != m.columns()) {
         os << '\t';
       }
@@ -185,7 +185,7 @@ bool operator==(const Matrix& lhs, const Matrix& rhs) {
   }
   for (size_t i = 0; i != lhs.rows(); ++i) {
     for (size_t j = 0; j != lhs.columns(); ++j) {
-      if (lhs[i][j] != rhs[i][j]) {
+      if (lhs(i, j) != rhs(i, j)) {
         return false;
       }
     }
@@ -210,9 +210,9 @@ Matrix operator*(const Matrix& lhs, const Matrix& rhs) {
   Matrix res(lhs.rows(), rhs.columns());
   for (size_t i = 0; i != res.rows(); ++i) {
     for (size_t j = 0; j != res.columns(); ++j) {
-      res[i][j] = 0;
+      res(i, j) = 0;
       for (size_t k = 0; k != lhs.columns(); ++k) {
-        res[i][j] += lhs[i][k] * rhs[k][j];
+        res(i, j) += lhs(i, k) * rhs(k, j);
       }
     }
   }
