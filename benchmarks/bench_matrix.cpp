@@ -2,19 +2,7 @@
 #include <random>
 
 #include <matrix/matrix.h>
-
-static Matrix gen_random_matrix(size_t rows, size_t columns) {
-  static std::mt19937 gen(42);
-  std::uniform_real_distribution<double> dist(-1.0, 1.0);
-  Matrix m(rows, columns);
-  for (size_t i = 0; i != rows; ++i) {
-    for (size_t j = 0; j != columns; ++j) {
-      m(i, j) = dist(gen);
-    }
-  }
-  return m;
-}
-
+#include <matrix/utils.h>
 
 static void BM_MatrixMultiplication(benchmark::State& state) {
   auto a = gen_random_matrix(state.range(0), state.range(1));
