@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include <matrix/matrix.h>
+#include <matrix/utils.h>
 #include <matrix/chain_multiplication.h>
 
 TEST(chain_multiplication, simple) {
@@ -71,5 +72,29 @@ TEST(chain_multiplication, optimal) {
             B.rows() * C.rows() * C.columns() +
             A.rows() * B.rows() * C.columns());
   ASSERT_EQ(ABC_node->get(), Res);
+};
+
+TEST(chain_multiplication, optimal_order) {
+  {
+    auto chain = gen_random_matrix_chain({10, 20, 30});
+    auto result = optimal_chain_order(chain);
+    ASSERT_EQ(result->rows(), 10);
+    ASSERT_EQ(result->columns(), 30);
+    ASSERT_EQ(result->number_of_float_multiplications(), 6000);
+  }
+  {
+    auto chain = gen_random_matrix_chain({10, 20, 30, 40, 30});
+    auto result = optimal_chain_order(chain);
+    ASSERT_EQ(result->rows(), 10);
+    ASSERT_EQ(result->columns(), 30);
+    ASSERT_EQ(result->number_of_float_multiplications(), 30000);
+  }
+  {
+    auto chain = gen_random_matrix_chain({40, 20, 30, 10, 30});
+    auto result = optimal_chain_order(chain);
+    ASSERT_EQ(result->rows(), 40);
+    ASSERT_EQ(result->columns(), 30);
+    ASSERT_EQ(result->number_of_float_multiplications(), 26000);
+  }
 };
 

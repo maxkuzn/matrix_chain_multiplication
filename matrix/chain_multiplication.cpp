@@ -41,6 +41,10 @@ MultiplicationTreeElementPtr optimal_chain_order(const std::vector<Matrix>& M) {
   }
   std::vector<size_t> dims;
   dims.reserve(M.size() + 1);
+  dims.push_back(M[0].rows());
+  for (auto&& m : M) {
+    dims.push_back(m.columns());
+  }
 
   // min_cost[l][r] stores minimum cost of multiplication
   // of chain matrices in [l, r]
