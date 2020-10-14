@@ -4,7 +4,8 @@
 
 Matrix gen_random_matrix(size_t rows, size_t columns) {
   static std::mt19937 gen(42);
-  std::uniform_real_distribution<double> dist(-1.0, 1.0);
+  static double max_abs = 0.25;
+  std::uniform_real_distribution<double> dist(-max_abs, max_abs);
   Matrix m(rows, columns);
   for (size_t i = 0; i != rows; ++i) {
     for (size_t j = 0; j != columns; ++j) {
