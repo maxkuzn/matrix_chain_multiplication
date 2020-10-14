@@ -18,8 +18,9 @@ using MultiplicationTreeElementPtr =  std::unique_ptr<MultiplicationTreeElement>
 
 class MultiplicationTreeLeaf : public MultiplicationTreeElement {
  public:
-   MultiplicationTreeLeaf(const Matrix& matrix) : matrix_(matrix) {
-   }
+  MultiplicationTreeLeaf(const Matrix& matrix) : matrix_(matrix) {
+  }
+
 
   Matrix get() override {
     return matrix_;
@@ -58,6 +59,7 @@ class MultiplicationTreeNode : public MultiplicationTreeElement {
       throw std::runtime_error("Number of columns for the left matrix doesn't equal to number of rows for the right matrix");
     }
   }
+
 
   Matrix get() override {
     return left_->get() * right_->get();
