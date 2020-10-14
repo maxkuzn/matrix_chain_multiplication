@@ -98,3 +98,23 @@ TEST(chain_multiplication, optimal_order) {
   }
 };
 
+TEST(chain_multiplication, simple_equals_optimal) {
+  {
+    auto chain = gen_random_matrix_chain({10, 20, 30});
+    auto optimal = optimal_chain_order(chain);
+    auto simple = simple_chain_order(chain);
+    ASSERT_EQ(simple->get(), optimal->get());
+  }
+  {
+    auto chain = gen_random_matrix_chain({10, 20, 30, 40, 30});
+    auto optimal = optimal_chain_order(chain);
+    auto simple = simple_chain_order(chain);
+    ASSERT_EQ(simple->get(), optimal->get());
+  }
+  {
+    auto chain = gen_random_matrix_chain({40, 20, 30, 10, 30});
+    auto optimal = optimal_chain_order(chain);
+    auto simple = simple_chain_order(chain);
+    ASSERT_EQ(simple->get(), optimal->get());
+  }
+}
