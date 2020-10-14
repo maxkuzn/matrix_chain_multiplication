@@ -12,10 +12,6 @@ add_compile_options(-Wall -Wextra -pedantic -Werror)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "bin")
 
 add_subdirectory(matrix)
-
-option(MATRIX_TESTS "Enable matrix library tests" OFF)
-
-if(${MATRIX_TESTS})
-    add_subdirectory(tests)
-endif()
+add_subdirectory(tests)
+add_subdirectory(benchmarks)
 
