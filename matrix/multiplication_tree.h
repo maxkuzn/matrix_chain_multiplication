@@ -4,12 +4,16 @@
 
 class MultiplicationTreeElement {
  public:
-  virtual const Matrix& get() = 0;
+  virtual ~MultiplicationTreeElement() = default;
+
+  virtual Matrix get() = 0;
 
   virtual size_t rows() const = 0;
   virtual size_t columns() const = 0;
-  virtual size_t shape() const = 0;
+  virtual Matrix::Shape shape() const = 0;
 };
+
+using MultiplicationTreeElementPtr =  std::unique_ptr<MultiplicationTreeElement>;
 
 
 class MultiplicationTreeLeaf : public MultiplicationTreeElement {
@@ -17,7 +21,7 @@ class MultiplicationTreeLeaf : public MultiplicationTreeElement {
    MultiplicationTreeLeaf(const Matrix& matrix) : matrix_(matrix) {
    }
 
-  const Matrix& get() override {
+  Matrix get() override {
     return matrix_;
   }
 
@@ -40,10 +44,10 @@ class MultiplicationTreeLeaf : public MultiplicationTreeElement {
 
 class MultiplicationTreeNode : public MultiplicationTreeElement {
  public:
-  MultiplicationTreeNode(std::unique_ptr<MultiplicationTreeElement>&& left,
-                         std::unique_ptr<MultiplicationTreeElement>&& right)
-    : left_(left)
-    , right_(right)
+  MultiplicationTreeNode(MultiplicationTreeElementPtr&& left,
+                         MultiplicationTreeElementPtr&& right)
+    : left_(std::move(left))
+    , right_(std::move(right))
     , rows_(left_ ? left_->rows() : 0)
     , columns_(right_ ? right_->columns() : 0)
   {
@@ -55,7 +59,7 @@ class MultiplicationTreeNode : public MultiplicationTreeElement {
     }
   }
 
-  const Matrix& get() override {
+  Matrix get() override {
     return left_->get() * right_->get();
   }
 
@@ -68,13 +72,13 @@ class MultiplicationTreeNode : public MultiplicationTreeElement {
   }
 
   Matrix::Shape shape() const override {
-    return Matrix::Shape(rows(), columns());
+    return Matrix::Shape{.rows = rows(), .columns = columns()};
   }
 
  private:
-   std::unique_ptr<MultiplicationTreeElement> left_;
-   std::unique_ptr<MultiplicationTreeElement> right_;
-   const size_t columns_;
+   MultiplicationTreeElementPtr left_;
+   MultiplicationTreeElementPtr right_;
    const size_t rows_;
+   const size_t columns_;
 };
 
