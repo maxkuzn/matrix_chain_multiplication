@@ -39,12 +39,22 @@ TEST(multiplication_tree, simple) {
 
     MultiplicationTreeElementPtr AB_node(
       new MultiplicationTreeNode(std::move(A_node), std::move(B_node)));
+
+    ASSERT_EQ(AB_node->rows(), A.rows());
+    ASSERT_EQ(AB_node->columns(), B.columns());
+    ASSERT_EQ(AB_node->number_of_float_multiplications(),
+              A.rows() * B.rows() * B.columns());
+
     MultiplicationTreeElementPtr ABC_node(
       new MultiplicationTreeNode(std::move(AB_node), std::move(C_node)));
     
     ASSERT_EQ(ABC_node->rows(), Res.rows());
     ASSERT_EQ(ABC_node->columns(), Res.columns());
     ASSERT_EQ(ABC_node->shape(), Res.shape());
+
+    ASSERT_EQ(ABC_node->number_of_float_multiplications(),
+              A.rows() * B.rows() * B.columns() +
+              A.rows() * C.rows() * C.columns());
     ASSERT_EQ(ABC_node->get(), Res);
   }
   {
@@ -60,12 +70,22 @@ TEST(multiplication_tree, simple) {
 
     MultiplicationTreeElementPtr BC_node(
       new MultiplicationTreeNode(std::move(B_node), std::move(C_node)));
+
+    ASSERT_EQ(BC_node->rows(), B.rows());
+    ASSERT_EQ(BC_node->columns(), C.columns());
+    ASSERT_EQ(BC_node->number_of_float_multiplications(),
+              B.rows() * C.rows() * C.columns());
+
     MultiplicationTreeElementPtr ABC_node(
       new MultiplicationTreeNode(std::move(A_node), std::move(BC_node)));
     
     ASSERT_EQ(ABC_node->rows(), Res.rows());
     ASSERT_EQ(ABC_node->columns(), Res.columns());
     ASSERT_EQ(ABC_node->shape(), Res.shape());
+
+    ASSERT_EQ(ABC_node->number_of_float_multiplications(),
+              B.rows() * C.rows() * C.columns() +
+              A.rows() * B.rows() * C.columns());
     ASSERT_EQ(ABC_node->get(), Res);
   }
 };

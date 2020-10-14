@@ -6,7 +6,9 @@ class MultiplicationTreeElement {
  public:
   virtual ~MultiplicationTreeElement() = default;
 
-  virtual Matrix get() = 0;
+  virtual Matrix get() const = 0;
+
+  virtual size_t number_of_float_multiplications() const = 0;
 
   virtual size_t rows() const = 0;
   virtual size_t columns() const = 0;
@@ -22,8 +24,12 @@ class MultiplicationTreeLeaf : public MultiplicationTreeElement {
   }
 
 
-  Matrix get() override {
+  Matrix get() const override {
     return matrix_;
+  }
+
+  size_t number_of_float_multiplications() const override {
+    return 0;
   }
 
   size_t rows() const override {
@@ -61,8 +67,14 @@ class MultiplicationTreeNode : public MultiplicationTreeElement {
   }
 
 
-  Matrix get() override {
+  Matrix get() const override {
     return left_->get() * right_->get();
+  }
+
+  size_t number_of_float_multiplications() const override {
+    return rows() * columns() * left_->columns() +
+           left_->number_of_float_multiplications() +
+           right_->number_of_float_multiplications();
   }
 
   size_t rows() const override {
