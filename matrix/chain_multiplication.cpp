@@ -17,14 +17,17 @@ MultiplicationTreeElementPtr simple_chain_order(const std::vector<Matrix>& matri
 static MultiplicationTreeElementPtr construct_multiplication_tree(
     const std::vector<Matrix>& M,
     const std::vector<std::vector<size_t>>& best_split,
-    size_t l, size_t r) {
+    size_t l, size_t r, size_t& node_id) {
   if (l == r) {
-    return MultiplicationTreeElementPtr(new MultiplicationTreeLeaf(M[l]));
+    return MultiplicationTreeElementPtr(new MultiplicationTreeLeaf(M[l], l + 1));
   }
+  size_t curr_node_id = node_id;
+  ++node_id;
   return MultiplicationTreeElementPtr(
       new MultiplicationTreeNode(
-        construct_multiplication_tree(M, best_split, l, best_split[l][r]),
-        construct_multiplication_tree(M, best_split, best_split[l][r] + 1, r)
+        construct_multiplication_tree(M, best_split, l, best_split[l][r], node_id),
+        construct_multiplication_tree(M, best_split, best_split[l][r] + 1, r, node_id),
+        curr_node_id
       )
   );
 }
@@ -32,7 +35,8 @@ static MultiplicationTreeElementPtr construct_multiplication_tree(
 static MultiplicationTreeElementPtr construct_multiplication_tree(
     const std::vector<Matrix>& M,
     const std::vector<std::vector<size_t>>& best_split) {
-  return construct_multiplication_tree(M, best_split, 0, M.size() - 1);
+  size_t node_id = M.size() + 1;
+  return construct_multiplication_tree(M, best_split, 0, M.size() - 1, node_id);
 }
 
 MultiplicationTreeElementPtr optimal_chain_order(const std::vector<Matrix>& M) {

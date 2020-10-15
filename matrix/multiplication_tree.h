@@ -1,4 +1,5 @@
 #include <memory>
+#include <sstream>
 
 #include "matrix.h"
 
@@ -13,6 +14,11 @@ class MultiplicationTreeElement {
   virtual size_t rows() const = 0;
   virtual size_t columns() const = 0;
   virtual Matrix::Shape shape() const = 0;
+
+  virtual size_t id() const = 0;
+  virtual size_t left_id() const = 0;
+  virtual size_t right_id() const = 0;
+  virtual void print_tree(std::stringstream& ss) const = 0;
 };
 
 using MultiplicationTreeElementPtr =  std::unique_ptr<MultiplicationTreeElement>;
@@ -20,8 +26,9 @@ using MultiplicationTreeElementPtr =  std::unique_ptr<MultiplicationTreeElement>
 
 class MultiplicationTreeLeaf : public MultiplicationTreeElement {
  public:
-  MultiplicationTreeLeaf(const Matrix& matrix) : matrix_(matrix) {
-  }
+  MultiplicationTreeLeaf(const Matrix& matrix, size_t id = 0)
+    : matrix_(matrix), id_(id)
+  {}
 
 
   Matrix get() const override {
@@ -44,19 +51,37 @@ class MultiplicationTreeLeaf : public MultiplicationTreeElement {
     return matrix_.shape();
   }
 
+  size_t id() const override {
+    return id_;
+  }
+
+  size_t left_id() const override {
+    return 0;
+  }
+
+  size_t right_id() const override {
+    return 0;
+  }
+
+  void print_tree(std::stringstream&) const override {
+  };
+
  private:
   const Matrix& matrix_;
+  const size_t id_;
 };
 
 
 class MultiplicationTreeNode : public MultiplicationTreeElement {
  public:
   MultiplicationTreeNode(MultiplicationTreeElementPtr&& left,
-                         MultiplicationTreeElementPtr&& right)
+                         MultiplicationTreeElementPtr&& right,
+                         size_t id = 0)
     : left_(std::move(left))
     , right_(std::move(right))
     , rows_(left_ ? left_->rows() : 0)
     , columns_(right_ ? right_->columns() : 0)
+    , id_(id)
   {
     if (!left_ || !right_) {
       throw std::runtime_error("At least one element wasn't provided");
@@ -89,10 +114,29 @@ class MultiplicationTreeNode : public MultiplicationTreeElement {
     return Matrix::Shape{.rows = rows(), .columns = columns()};
   }
 
+  size_t id() const override {
+    return id_;
+  }
+
+  size_t left_id() const override {
+    return left_->id();
+  }
+
+  size_t right_id() const override {
+    return right_->id();
+  }
+
+  void print_tree(std::stringstream& ss) const override {
+    ss << id_ << ": " << left_id() << ' ' << right_id() << '\n';
+    left_->print_tree(ss);
+    right_->print_tree(ss);
+  };
+
  private:
    MultiplicationTreeElementPtr left_;
    MultiplicationTreeElementPtr right_;
    const size_t rows_;
    const size_t columns_;
+   const size_t id_;
 };
 
