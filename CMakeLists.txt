@@ -15,3 +15,6 @@ add_subdirectory(matrix)
 add_subdirectory(tests)
 add_subdirectory(benchmarks)
 
+add_executable(print_tree print_tree.cpp)
+target_link_libraries(print_tree matrix)
+
