@@ -1,2 +1,5 @@
 build/
+.ipynb_checkpoints/
+tree.dot
+tree.png
 
