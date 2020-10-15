@@ -6,7 +6,7 @@ Implemented algorithm for fast [matrix chain multiplication](https://en.wikipedi
 # Installation
 ```
 # Checkout library
-$ git clone https://github.com/maxkuzn/matrix_chain_multiplication.git
+$ git clone --recursive https://github.com/maxkuzn/matrix_chain_multiplication.git
 # Go to root directory
 $ cd matrix_chain_multiplication
 # Create directory for build
