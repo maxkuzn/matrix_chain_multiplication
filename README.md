@@ -22,3 +22,8 @@ $ make
 # From root directory
 $ ./build/tests/bin/<test_name>
 $ ./build/benchmarsk/bin/<benchmark_name>
+```
+
+# Visualization
+You can visualize the multiplication tree in show_tree.ipynb.  
+It requires graphviz library.  
